@@ -39,6 +39,9 @@ while True:
   
     i = 0
 
+    if len(contours)<1:
+        continue
+
     maxcontour = max(contours, key=cv2.contourArea)
   
     # list for storing names of shapes
