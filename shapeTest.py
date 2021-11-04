@@ -12,8 +12,8 @@ while True:
     _, frame = cap.read()
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     
-    lower_red = np.array([0,0,100])
-    upper_red = np.array([20,255,255])
+    lower_red = np.array([150,100,150])
+    upper_red = np.array([255,255,255])
     
     mask = cv2.inRange(hsv, lower_red, upper_red)
     res = cv2.bitwise_and(frame,frame, mask= mask)
@@ -38,51 +38,55 @@ while True:
         threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
   
     i = 0
+
+    maxcontour = max(contours, key=cv2.contourArea)
   
     # list for storing names of shapes
-    for contour in contours:
     
-        # here we are ignoring first counter because 
-        # findcontour function detects whole image as shape
-        if i == 0:
-            i = 1
-            continue
-        
-        # cv2.approxPloyDP() function to approximate the shape
-        approx = cv2.approxPolyDP(
-            contour, 0.01 * cv2.arcLength(contour, True), True)
+    contour = maxcontour # only do the max contour
 
-        # using drawContours() function
-        cv2.drawContours(img, [contour], 0, (0, 0, 255), 5)
+    # here we are ignoring first counter because 
+    # findcontour function detects whole image as shape
     
-        # finding center point of shape
-        M = cv2.moments(contour)
-        x = 0
-        y = 0
-        if M['m00'] != 0.0:
-            x = int(M['m10']/M['m00'])
-            y = int(M['m01']/M['m00'])
-    
-        # putting shape name at center of each shape
-        if len(approx) == 3:
-            cv2.putText(img, 'Triangle', (x, y),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-    
-        elif len(approx) == 4:
-            cv2.putText(img, 'Quadrilateral', (x, y),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-    
-        elif len(approx) == 5:
-            cv2.putText(img, 'Pentagon', (x, y),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-    
-        elif len(approx) == 6:
-            cv2.putText(img, 'Hexagon', (x, y),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-    
-        else:
-            cv2.putText(img, 'circle', (x, y),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+    # cv2.approxPloyDP() function to approximate the shape
+    approx = cv2.approxPolyDP(
+        contour, 0.01 * cv2.arcLength(contour, True), True)
+    # using drawContours() function
+    cv2.drawContours(img, [contour], 0, (0, 0, 255), 5)
+
+    # finding center point of shape
+    M = cv2.moments(contour)
+    x = 0
+    y = 0
+    if M['m00'] != 0.0:
+        x = int(M['m10']/M['m00'])
+        y = int(M['m01']/M['m00'])
+
+    # putting shape name at center of each shape
+    if len(approx) == 3:
+        cv2.putText(img, 'Triangle', (x, y),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+
+    elif len(approx) == 4:
+        cv2.putText(img, 'Quadrilateral', (x, y),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+
+    elif len(approx) == 5:
+        cv2.putText(img, 'Pentagon', (x, y),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+
+    elif len(approx) == 6:
+        cv2.putText(img, 'Hexagon', (x, y),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+
+    else:
+        cv2.putText(img, 'circle', (x, y),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+
+    x, y, w, h = cv2.boundingRect(contour)
+    cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+    center = (x, y)
+    print(center)
     
     # displaying the image after drawing contours
     cv2.imshow('shapes', img)
