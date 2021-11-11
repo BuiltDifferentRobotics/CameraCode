@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import math
 from matplotlib import pyplot as plt
 
 cap = cv2.VideoCapture(0)
@@ -12,8 +13,8 @@ while True:
     _, frame = cap.read()
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     
-    lower_red = np.array([150,100,150])
-    upper_red = np.array([255,255,255])
+    lower_red = np.array([25,100,50])
+    upper_red = np.array([100,255,255])
     
     mask = cv2.inRange(hsv, lower_red, upper_red)
     res = cv2.bitwise_and(frame,frame, mask= mask)
@@ -89,20 +90,40 @@ while True:
     x, y, w, h = cv2.boundingRect(contour)
     cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
     center = (x, y)
-    print(center)
+    wh = (w, h)
+
+    # at 20 inches away, w = 113
+    dist = 20*(113/w)
+
+
+    refrect = (287+w/2, 214+h/2, 63, 49)
+    refarea = refrect[2] * refrect[3]
+    print("center " ,center, " wh", wh)
+    print("dist: ", dist)
+
+
+    '''
+    nx= (1/960) * (x-959.5)
+    ny= (1/540) * (y-539.5)
+
+    horizontol_fov = 1.117
+    vertical_fov = 0.7854
+
+    vpw = 2.0*math.tan(horizontol_fov/2)
+    vph = 2.0*math.tan(vertical_fov/2)
+    
+    x = vpw/2 * nx
+    y = vph/2 * ny
+
+    ax = math.atan2(1,x)
+    ay = math.atan2(1,y)
+    print("anglex:", ax, "angley:", ay)
+    '''
+
     
     # displaying the image after drawing contours
     cv2.imshow('shapes', img)
     
-    '''
-    lower_red = np.array([30,150,50])
-    upper_red = np.array([255,255,180])
-    
-    mask = cv2.inRange(hsv, lower_red, upper_red)
-    res = cv2.bitwise_and(frame,frame, mask= mask)
-
-    cv2.imshow('res',res)
-    '''
     
     k = cv2.waitKey(5) & 0xFF
     if k == 27:
@@ -110,5 +131,3 @@ while True:
 
 cap.release()
 cv2.destroyAllWindows()
-
-  
