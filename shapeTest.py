@@ -13,8 +13,8 @@ while True:
     _, frame = cap.read()
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     
-    lower_red = np.array([25,100,50])
-    upper_red = np.array([100,255,255])
+    lower_red = np.array([150,100,50])
+    upper_red = np.array([255,255,255])
     
     mask = cv2.inRange(hsv, lower_red, upper_red)
     res = cv2.bitwise_and(frame,frame, mask= mask)
@@ -98,7 +98,7 @@ while True:
 
     refrect = (287+w/2, 214+h/2, 63, 49)
     refarea = refrect[2] * refrect[3]
-    print("center " ,center, " wh", wh)
+    #print("center " ,center, " wh", wh)
     print("dist: ", dist)
 
 
