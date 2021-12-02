@@ -3,8 +3,26 @@ import numpy as np
 import math
 from matplotlib import pyplot as plt
 
-cap = cv2.VideoCapture(0)
+def nothing(x):
+    pass
 
+cap = cv2.VideoCapture(0)
+cv2.namedWindow('image')
+
+b = np.loadtxt('test1.txt', dtype=int)
+
+cv2.createTrackbar('Hmin','image',0,255,nothing)
+cv2.createTrackbar('Smin','image',0,255,nothing)
+cv2.createTrackbar('Vmin','image',0,255,nothing)
+cv2.createTrackbar('Hmax','image',0,255,nothing)
+cv2.createTrackbar('Smax','image',0,255,nothing)
+cv2.createTrackbar('Vmax','image',0,255,nothing)
+cv2.setTrackbarPos('Hmin','image',b[0])
+cv2.setTrackbarPos('Smin','image',b[1])
+cv2.setTrackbarPos('Vmin','image',b[2])
+cv2.setTrackbarPos('Hmax','image',b[3])
+cv2.setTrackbarPos('Smax','image',b[4])
+cv2.setTrackbarPos('Vmax','image',b[5])
 # Check if the webcam is opened correctly
 if not cap.isOpened():
     raise IOError("Cannot open webcam")
@@ -13,8 +31,8 @@ while True:
     _, frame = cap.read()
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     
-    lower_red = np.array([150,100,50])
-    upper_red = np.array([255,255,255])
+    lower_red = np.array([cv2.getTrackbarPos('Hmin','image'),cv2.getTrackbarPos('Smin','image'),cv2.getTrackbarPos('Vmin','image')])
+    upper_red = np.array([cv2.getTrackbarPos('Hmax','image'),cv2.getTrackbarPos('Smax','image'),cv2.getTrackbarPos('Vmax','image')])
     
     mask = cv2.inRange(hsv, lower_red, upper_red)
     res = cv2.bitwise_and(frame,frame, mask= mask)
@@ -127,6 +145,8 @@ while True:
     
     k = cv2.waitKey(5) & 0xFF
     if k == 27:
+        a = np.concatenate((lower_red, upper_red))
+        np.savetxt('test1.txt', a, fmt='%d')
         break
 
 cap.release()
